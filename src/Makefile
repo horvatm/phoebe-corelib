@@ -1,6 +1,6 @@
 #CXX=icpc
-CXX=g++
-#CXX=clang++
+#CXX=g++
+CXX=clang++
 CXXFLAGS=-O3 -Wall -std=c++11
 
 ifdef PYTHON

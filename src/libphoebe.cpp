@@ -3589,6 +3589,9 @@ static PyObject *rotstar_misaligned_gradOmega_only(PyObject *self, PyObject *arg
 
   auto fname = "rotstar_misaligned_gradOmega_only"_s;
 
+  if (verbosity_level>=4)
+    report_stream << fname << "::START" << std::endl;
+
   double p[5];
 
   PyObject *o_misalignment;
@@ -3604,8 +3607,6 @@ static PyObject *rotstar_misaligned_gradOmega_only(PyObject *self, PyObject *arg
     return NULL;
   }
 
-  Tmisaligned_rot_star<double> b(p);
-
   if (PyFloat_Check(o_misalignment)) {
 
     double s = std::sin(PyFloat_AsDouble(o_misalignment));
@@ -3620,9 +3621,21 @@ static PyObject *rotstar_misaligned_gradOmega_only(PyObject *self, PyObject *arg
     for (int i = 0; i < 3; ++i) p[i+1] = s[i];
   }
 
-  double g[3];
+  p[4] = 0;   // Omega0 = 0
 
-  b.grad_only((double*)PyArray_DATA(X), g);
+  Tmisaligned_rot_star<double> b(p);
+
+  double g[3], *r = (double*)PyArray_DATA(X);
+
+  if (verbosity_level>=4)
+    report_stream << fname + "::r=" << r[0] << '\t' << r[1] << '\t' <<  r[2] << '\n';
+
+  b.grad_only(r, g);
+
+  if (verbosity_level>=4) {
+    report_stream << fname + "::g=" << g[0] << '\t' << g[1] << '\t' <<  g[2] << '\n';
+    report_stream << fname << "::END" << std::endl;
+  }
 
   return PyArray_FromVector(3, g);
 }
